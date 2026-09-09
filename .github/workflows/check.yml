@@ -27,4 +27,5 @@ jobs:
         with:
           name: ai-content-rinse-release
           path: .build/*.zip
+          include-hidden-files: true
           if-no-files-found: error
