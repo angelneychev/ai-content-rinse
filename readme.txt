@@ -43,6 +43,12 @@ No. Text recovery records are retained. Restore text before uninstalling if you 
 = Does it guarantee removal of AI watermarks? =
 No. It reports concrete character and metadata findings only.
 
+== Screenshots ==
+
+1. Paste text, inspect changes highlighted in red and green, and copy the cleaned result.
+2. Clean visible text while preserving WordPress block comments, HTML markup and code.
+3. Review supported image metadata before replacing the existing file. This example uses demonstration metadata.
+
 == Changelog ==
 
 = 0.3.1 =
