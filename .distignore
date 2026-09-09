@@ -1,0 +1,11 @@
+.git
+.github
+.gitignore
+.gitattributes
+.distignore
+.build
+tools
+tests
+README.md
+RELEASING.md
+UPSTREAM.md

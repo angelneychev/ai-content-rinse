@@ -1,0 +1,32 @@
+name: Publish approved WordPress.org release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+concurrency:
+  group: wordpress-release
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: vars.WORDPRESS_ORG_APPROVED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check syntax
+        run: |
+          find . -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l
+          node --check assets/admin.js
+      - name: Verify tag and build package
+        run: php tools/package.php
+      - uses: WordPress/plugin-check-action@10857da14b6c2246d15402b3e69f777edcf8c12e
+        with:
+          build-dir: .build/ai-content-rinse
+          slug: ai-content-rinse
+      - uses: 10up/action-wordpress-plugin-deploy@54bd289b8525fd23a5c365ec369185f2966529c2
+        env:
+          SLUG: ai-content-rinse
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}

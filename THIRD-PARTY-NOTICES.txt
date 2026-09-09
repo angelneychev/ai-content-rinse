@@ -1,0 +1,11 @@
+# License and reference information
+
+AI Content Rinse is maintained by Angel Neychev, https://angelneychev.eu.
+Copyright 2026 Angel Neychev. Distributed under GPL-2.0-or-later.
+
+The scope was informed by https://github.com/guillaumemeyer/watermarks-remover.
+This plugin is an independently written PHP and JavaScript implementation. It does not bundle that project's code, runtime, libraries, images or models.
+
+WordPress supplies the JavaScript internationalization library at runtime. No third-party JavaScript library is bundled.
+
+Any future incorporation of third-party source must preserve its license and copyright notices and be recorded here.
