@@ -1,10 +1,10 @@
-=== AI Content Rinse - Text & Metadata Cleaner ===
+=== AI Content Rinse: Text & Metadata Cleaner ===
 Contributors: angelneychev
 Tags: content cleanup, metadata, unicode, ai, privacy
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.3.2
+Stable tag: 0.3.3
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,7 +13,7 @@ Clean copied text and selected image metadata. Preview exact changes, restore te
 == Description ==
 
 AI Content Rinse helps review content copied from AI tools and other sources.
-Created by Angel Neychev - https://angelneychev.eu - angel.neychev@gmail.com.
+Created by Angel Neychev. Website: https://angelneychev.eu. Contact: angel.neychev@gmail.com.
 
 * Scan post/page titles, content and excerpts for zero-width spaces, BOM characters and soft hyphens.
 * Preview the proposed text changes before applying them.
@@ -50,6 +50,9 @@ No. It reports concrete character and metadata findings only.
 3. Review supported image metadata before replacing the existing file. This example uses demonstration metadata.
 
 == Changelog ==
+
+= 0.3.3 =
+* Use a colon in the public name and sentences in the author line so directory formatting does not turn keyboard hyphens into typographic dashes.
 
 = 0.3.2 =
 * Use standard keyboard punctuation in the plugin name, public description and interface labels.

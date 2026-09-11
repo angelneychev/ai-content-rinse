@@ -4,6 +4,10 @@ $root = dirname(__DIR__);
 $header = file_get_contents($root . '/ai-content-rinse.php');
 $readme = file_get_contents($root . '/readme.txt');
 $js = file_get_contents($root . '/assets/admin.js');
+preg_match('/^\s*\* Plugin Name:\s*(.+)$/m', $header, $nameMatch);
+if (str_contains($readme . ($nameMatch[1] ?? ''), ' - ')) {
+    throw new RuntimeException('WordPress.org converts spaced hyphens to typographic dashes. Use a colon or a sentence in directory copy.');
+}
 // Check authored copy, while allowing deliberate Unicode detection rules and examples.
 preg_match_all('/\'(?:\\\\.|[^\'\\\\])*\'/s', $js, $copyMatches);
 $copy = $header . $readme . file_get_contents($root . '/README.md') . implode("\n", $copyMatches[0]);

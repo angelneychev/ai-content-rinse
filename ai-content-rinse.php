@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: AI Content Rinse - Text & Metadata Cleaner
+ * Plugin Name: AI Content Rinse: Text & Metadata Cleaner
  * Description: Review text cleanup and remove supported image metadata in place. Preview exact changes and verify cleaned files.
- * Version: 0.3.2
+ * Version: 0.3.3
  * Requires at least: 6.5
  * Requires PHP: 8.1
  * Author: Angel Neychev
@@ -32,8 +32,8 @@ function aicr_assets( $hook ) {
 	if ( 'tools_page_ai-content-rinse' !== $hook ) {
 		return;
 	}
-	wp_enqueue_style( 'aicr-admin', plugins_url( 'assets/admin.css', __FILE__ ), array(), '0.3.2' );
-	wp_enqueue_script( 'aicr-admin', plugins_url( 'assets/admin.js', __FILE__ ), array( 'wp-i18n' ), '0.3.2', true );
+	wp_enqueue_style( 'aicr-admin', plugins_url( 'assets/admin.css', __FILE__ ), array(), '0.3.3' );
+	wp_enqueue_script( 'aicr-admin', plugins_url( 'assets/admin.js', __FILE__ ), array( 'wp-i18n' ), '0.3.3', true );
 	wp_set_script_translations( 'aicr-admin', 'ai-content-rinse' );
 	// Use the query-string REST transport so the workspace also works when
 	// Apache URL rewriting is unavailable on a local XAMPP installation.
@@ -45,7 +45,7 @@ function aicr_assets( $hook ) {
 function aicr_page() {
 	?>
 	<div class="wrap aicr">
-		<header><span class="aicr-eyebrow">AI CONTENT RINSE / 0.3.2</span><h1><?php esc_html_e( 'Review and clean your content.', 'ai-content-rinse' ); ?></h1>
+		<header><span class="aicr-eyebrow">AI CONTENT RINSE / 0.3.3</span><h1><?php esc_html_e( 'Review and clean your content.', 'ai-content-rinse' ); ?></h1>
 		<p><?php esc_html_e( 'Preview text changes and remove supported image metadata.', 'ai-content-rinse' ); ?></p></header>
 		<nav aria-label="<?php esc_attr_e( 'Workspace', 'ai-content-rinse' ); ?>">
 			<button class="button button-primary" data-tab="text"><?php esc_html_e( 'Text', 'ai-content-rinse' ); ?></button>
