@@ -13,7 +13,6 @@ Clean copied text and selected image metadata. Preview exact changes, restore te
 == Description ==
 
 AI Content Rinse helps review content copied from AI tools and other sources.
-Created by Angel Neychev. Website: https://angelneychev.eu. Contact: angel.neychev@gmail.com.
 
 * Scan post/page titles, content and excerpts for zero-width spaces, BOM characters and soft hyphens.
 * Preview the proposed text changes before applying them.
