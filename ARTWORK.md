@@ -14,7 +14,7 @@ The `.wordpress-org` directory contains the public listing artwork:
 | screenshot-2.png | 1120 × 649 | Preserved HTML and code |
 | screenshot-3.png | 1120 × 1276 | Image metadata preview |
 
-Screenshots are captures of the actual version 0.3.1 interface, cropped to the plugin content area. They use demonstration text and an image containing an explicitly added sample PNG text chunk. No results were fabricated or painted into the interface. The temporary media item was removed after capture.
+Screenshots are captures of the actual version 0.3.2 interface, cropped to the plugin content area. They use demonstration text and an image containing an explicitly added sample PNG text chunk. No results were fabricated or painted into the interface. The temporary media item was removed after capture.
 
 Artwork uses an ivory document, a mint water ribbon and a forest green background. Banners identify Angel Neychev as the author. No third-party brand marks are included. Artwork is distributed under the repository's GPL-2.0-or-later license.
 

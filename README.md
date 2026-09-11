@@ -20,7 +20,7 @@ Review copied text character by character, clean supported image metadata in pla
 
 Requires WordPress 6.5+ and PHP 8.1+. Tested locally with WordPress 7.1 and PHP 8.3.
 
-Build the installable archive with `php tools/package.php`, then upload `.build/ai-content-rinse-0.3.1.zip` through Plugins > Add New > Upload Plugin. Open Tools > AI Content Rinse after activation.
+Build the installable archive with `php tools/package.php`, then upload `.build/ai-content-rinse-0.3.2.zip` through Plugins > Add New > Upload Plugin. Open Tools > AI Content Rinse after activation.
 
 A GitHub source download is a development archive. The ZIP produced by the packaging script is the WordPress installation package.
 
@@ -51,4 +51,4 @@ See [RELEASING.md](RELEASING.md) for the initial WordPress.org review and subseq
 
 Copyright 2026 Angel Neychev. GPL-2.0-or-later; see [LICENSE.txt](LICENSE.txt).
 
-Contact: angel.neychev@gmail.com · https://angelneychev.eu
+Contact: angel.neychev@gmail.com - https://angelneychev.eu

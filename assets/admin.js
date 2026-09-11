@@ -35,7 +35,7 @@
         busy = true;
         const disabled = Array.from(document.querySelectorAll('.aicr button, .aicr input, .aicr select'));
         disabled.forEach(node => { node.disabled = true; });
-        status.textContent = __('Working…', 'ai-content-rinse');
+        status.textContent = __('Working...', 'ai-content-rinse');
         try { await action(); status.textContent = __('Ready.', 'ai-content-rinse'); }
         catch (error) { status.textContent = error.message; }
         finally {
@@ -65,7 +65,7 @@
         for (const side of ['before', 'after']) {
             const column = el('div');
             const pre = el('pre');
-            column.append(el('h4', side === 'before' ? __('Before — changes in red', 'ai-content-rinse') : __('After — replacements in green', 'ai-content-rinse')));
+            column.append(el('h4', side === 'before' ? __('Before - changes in red', 'ai-content-rinse') : __('After - replacements in green', 'ai-content-rinse')));
             for (const segment of segments) {
                 if (!segment.label) { pre.append(document.createTextNode(segment[side])); continue; }
                 if (side === 'after' && !segment.after) continue;
@@ -73,7 +73,7 @@
                     ? (/[—–]/u.test(segment.before) ? segment.before : '⟦' + segment.label + '⟧')
                     : segment.after;
                 const mark = el('mark', visible, side === 'before' ? 'aicr-removed' : 'aicr-added');
-                mark.title = segment.label + ' · ' + (side === 'before' ? __('Removed during cleanup', 'ai-content-rinse') : __('Inserted during cleanup', 'ai-content-rinse'));
+                mark.title = segment.label + ' - ' + (side === 'before' ? __('Removed during cleanup', 'ai-content-rinse') : __('Inserted during cleanup', 'ai-content-rinse'));
                 pre.append(mark);
             }
             column.append(pre);
@@ -85,7 +85,7 @@
         const labels = { post_title: __('Title', 'ai-content-rinse'), post_content: __('Content', 'ai-content-rinse'), post_excerpt: __('Excerpt', 'ai-content-rinse') };
         for (const key of Object.keys(labels)) {
             const count = Object.values(result.counts[key]).reduce((a, b) => a + b, 0);
-            if (count) target.append(el('h3', labels[key] + ' · ' + count), comparison(result.segments[key]));
+            if (count) target.append(el('h3', labels[key] + ' - ' + count), comparison(result.segments[key]));
         }
         target.append(el('p', result.changed
             ? __('Only these text changes will be saved. A text recovery record is stored first.', 'ai-content-rinse')
@@ -94,13 +94,13 @@
     function mediaDetails(result, target) {
         target.append(el('p', __('Removable metadata blocks across all image sizes:', 'ai-content-rinse') + ' ' + result.removed));
         const files = el('ul');
-        for (const file of result.files) files.append(el('li', file.name + ' · ' + file.removed + (file.hints.length ? ' · ' + file.hints.join('; ') : '')));
+        for (const file of result.files) files.append(el('li', file.name + ' - ' + file.removed + (file.hints.length ? ' - ' + file.hints.join('; ') : '')));
         target.append(files, el('p', __('Cleaning replaces these existing files, including available thumbnails and the saved original. Pixel data is preserved. EXIF and colour profiles are retained.', 'ai-content-rinse')));
         target.append(el('p', __('C2PA detection covers PNG caBX blocks. JPEG comments/XMP and WebP XMP are also cleaned. Other provenance formats and pixel watermarks are outside this check.', 'ai-content-rinse')));
     }
     function mediaOutcome(saved, target) {
         target.append(el('h3', saved.ok ? __('Cleaned and verified.', 'ai-content-rinse') : __('Cleaning was not completed for every file.', 'ai-content-rinse')));
-        for (const file of saved.files) target.append(el('p', file.name + ' · ' + __('Removed:', 'ai-content-rinse') + ' ' + file.removed + ' · ' + __('Remaining supported blocks:', 'ai-content-rinse') + ' ' + file.remaining));
+        for (const file of saved.files) target.append(el('p', file.name + ' - ' + __('Removed:', 'ai-content-rinse') + ' ' + file.removed + ' - ' + __('Remaining supported blocks:', 'ai-content-rinse') + ' ' + file.remaining));
         for (const error of saved.errors) target.append(el('p', error.name + ': ' + error.message, 'aicr-error'));
         target.append(el('p', __('Remaining supported blocks across all files:', 'ai-content-rinse') + ' ' + (saved.remaining === null ? __('Could not verify every file.', 'ai-content-rinse') : saved.remaining)));
         if (saved.provenance.detected) target.append(el('p', saved.provenance.hints.join('; ')));
@@ -187,7 +187,7 @@
         const input = el('textarea'); input.id = 'aicr-paste'; input.rows = 10;
         const formatLabel = el('label', __('Input format', 'ai-content-rinse')); formatLabel.htmlFor = 'aicr-format';
         const format = el('select'); format.id = 'aicr-format';
-        for (const [value, title] of [['plain', __('Plain text', 'ai-content-rinse')], ['html', __('WordPress / HTML — preserve markup and code', 'ai-content-rinse')]]) {
+        for (const [value, title] of [['plain', __('Plain text', 'ai-content-rinse')], ['html', __('WordPress / HTML - preserve markup and code', 'ai-content-rinse')]]) {
             const option = el('option', title); option.value = value; format.append(option);
         }
         list.append(label, input, formatLabel, format, button(__('Preview cleanup', 'ai-content-rinse'), async () => {
@@ -225,7 +225,7 @@
         pager.replaceChildren();
         if (mode === 'paste') { pasteWorkspace(); return; }
         renderControls();
-        list.replaceChildren(el('p', __('Loading…', 'ai-content-rinse')));
+        list.replaceChildren(el('p', __('Loading...', 'ai-content-rinse')));
         const data = await api('items?mode=' + mode + '&page=' + page + '&search=' + encodeURIComponent(search));
         if (stamp !== generation) return;
         list.replaceChildren(el('h2', mode === 'media' ? __('Image metadata', 'ai-content-rinse') : mode === 'history' ? __('Text recovery copies', 'ai-content-rinse') : __('Posts & pages', 'ai-content-rinse')));
