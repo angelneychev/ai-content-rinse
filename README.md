@@ -34,6 +34,8 @@ Text recovery records are retained on uninstall. Page-builder data is not suppor
 
 ## Development
 
+Planned additions are tracked in [ROADMAP.md](ROADMAP.md), one feature per future release.
+
 The runtime files are at the repository root. No JavaScript compilation or vendor dependencies are required. GitHub Actions builds an allowlisted ZIP, checks PHP/JavaScript syntax and runs WordPress Plugin Check.
 
 Integration tests require a disposable WordPress installation with this plugin active and an administrator account named `administrator`. Set `AICR_WP_ROOT` to that installation and run:
