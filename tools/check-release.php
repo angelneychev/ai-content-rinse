@@ -3,7 +3,7 @@ if (PHP_SAPI !== 'cli') { http_response_code(403); exit; }
 $root = dirname(__DIR__);
 $header = file_get_contents($root . '/ai-content-rinse.php');
 $readme = file_get_contents($root . '/readme.txt');
-$js = file_get_contents($root . '/assets/admin.js');
+$js = file_get_contents($root . '/assets/admin.js') . file_get_contents($root . '/assets/common.js') . file_get_contents($root . '/assets/editor.js');
 preg_match('/^\s*\* Plugin Name:\s*(.+)$/m', $header, $nameMatch);
 if (str_contains($readme . ($nameMatch[1] ?? ''), ' - ')) {
     throw new RuntimeException('WordPress.org converts spaced hyphens to typographic dashes. Use a colon or a sentence in directory copy.');

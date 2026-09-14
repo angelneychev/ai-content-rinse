@@ -4,7 +4,7 @@ Tags: content cleanup, metadata, unicode, ai, privacy
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.3.3
+Stable tag: 0.4.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,9 +16,12 @@ AI Content Rinse helps review content copied from AI tools and other sources.
 
 * Scan post/page titles, content and excerpts for zero-width spaces, BOM characters and soft hyphens.
 * Preview the proposed text changes before applying them.
+* Review the current title, content and excerpt directly in the block editor, including unsaved edits. Apply the reviewed changes to the editor and use WordPress Undo or Save.
+* Choose invisible-character removal and long-dash replacement independently. Both are enabled initially; preferences are saved for each administrator.
 * Preserve HTML tags, block comments, attributes, shortcodes, code, Cyrillic and emoji joiners.
 * Restore text backups when no subsequent editorial changes would be overwritten.
 * Paste plain text or WordPress/HTML content, preview exact character changes and copy the cleaned result.
+* Load a demonstration text with invisible characters and long dashes to try the preview. Replacing entered text requires confirmation.
 * Search content, filter findings on the current page and review selected items before batch cleanup.
 * Clean supported image metadata in existing files, including available resized versions and saved originals, without regenerating image sizes.
 * Verify staged bytes before replacement and scan the saved files again. Report per-file results and incomplete operations.
@@ -33,8 +36,18 @@ No external service, account, tracking or AI API key is required. Findings do no
 2. Activate AI Content Rinse.
 3. Open Tools > AI Content Rinse.
 4. Scan an item and review changes before applying them.
+5. In a post or page block editor, open Settings > Post or Page > AI Content Rinse to clean the current editor text.
 
 == Frequently Asked Questions ==
+
+= Does editor cleanup publish my post? =
+No. It changes the current editor fields after your review. Save or update with the normal WordPress controls. WordPress autosave continues normally. Use WordPress Undo to revert the cleanup; this action does not create a recovery record in the plugin's History tab.
+
+= Which editors are supported? =
+The editor panel supports the visual block editor for posts and pages and is available to administrators. Classic Editor users can use Tools > AI Content Rinse for saved content. Page-builder data, bound blocks, invalid blocks and content that cannot be parsed and serialized without changes are not supported by the editor panel. Editor previews are limited to 1 MB across title, content and excerpt.
+
+= Can I keep my long dashes? =
+Yes. Turn off long-dash replacement while keeping invisible-character cleanup enabled, or choose either category separately. Preferences apply to text previews and do not affect image metadata cleanup. Already reviewed workspace changes remain tied to their original preview.
 
 = Are backups deleted on uninstall? =
 No. Text recovery records are retained. Restore text before uninstalling if you want the pre-cleaning version. Image cleanup does not create recovery copies.
@@ -47,8 +60,15 @@ No. It reports concrete character and metadata findings only.
 1. Paste text, inspect changes highlighted in red and green, and copy the cleaned result.
 2. Clean visible text while preserving WordPress block comments, HTML markup and code.
 3. Review supported image metadata before replacing the existing file. This example uses demonstration metadata.
+4. Preview unsaved title, content and excerpt changes directly in the block editor before applying them.
 
 == Changelog ==
+
+= 0.4.0 =
+* Add reviewed cleanup in the post/page block editor with support for unsaved edits and WordPress Undo.
+* Add independent, per-user preferences for invisible characters and long dashes.
+* Add a loadable example in the paste workspace.
+* Reject stale editor previews and block content that cannot be preserved exactly.
 
 = 0.3.3 =
 * Use a colon in the public name and sentences in the author line so directory formatting does not turn keyboard hyphens into typographic dashes.

@@ -2,6 +2,25 @@
 (() => {
     'use strict';
     const { __ } = wp.i18n;
+    const { api, comparison, ruleLabels } = window.aicrUI;
+    let rules = { ...aicrConfig.rules };
+    function ruleControls() {
+        const group = el('fieldset', undefined, 'aicr-rules');
+        group.append(el('legend', __('Text cleanup settings', 'ai-content-rinse')));
+        for (const [key, title] of Object.entries(ruleLabels)) {
+            const label = el('label');
+            const input = el('input'); input.type = 'checkbox'; input.checked = rules[key];
+            input.addEventListener('change', () => run(async () => {
+                try { rules = await api('settings', { rules: { ...rules, [key]: input.checked } }); }
+                finally { input.checked = rules[key]; }
+                preview.replaceChildren(); preview.hidden = true; selected.clear();
+                if (mode === 'text') await load();
+            }));
+            label.append(input, document.createTextNode(title)); group.append(label);
+        }
+        group.append(el('small', __('Saved for your account. Applies to text cleanup only.', 'ai-content-rinse')));
+        return group;
+    }
     const list = document.getElementById('aicr-list');
     const status = document.getElementById('aicr-status');
     const preview = document.getElementById('aicr-preview');
@@ -16,31 +35,17 @@
         if (['button', 'input', 'select'].includes(tag)) node.disabled = busy;
         return node;
     };
-    async function api(path, body) {
-        const parts = path.split('?');
-        const requestUrl = aicrConfig.root.includes('rest_route=')
-            ? aicrConfig.root + encodeURIComponent(parts[0]) + (parts[1] ? '&' + parts[1] : '')
-            : aicrConfig.root + path;
-        const response = await fetch(requestUrl, {
-            method: body ? 'POST' : 'GET',
-            headers: { 'X-WP-Nonce': aicrConfig.nonce, 'Content-Type': 'application/json' },
-            credentials: 'same-origin', body: body ? JSON.stringify(body) : undefined
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || __('Request failed.', 'ai-content-rinse'));
-        return data;
-    }
     async function run(action) {
         if (busy) return;
         busy = true;
-        const disabled = Array.from(document.querySelectorAll('.aicr button, .aicr input, .aicr select'));
+        const disabled = Array.from(document.querySelectorAll('.aicr button, .aicr input, .aicr select, .aicr textarea'));
         disabled.forEach(node => { node.disabled = true; });
         status.textContent = __('Working...', 'ai-content-rinse');
         try { await action(); status.textContent = __('Ready.', 'ai-content-rinse'); }
         catch (error) { status.textContent = error.message; }
         finally {
             busy = false;
-            document.querySelectorAll('.aicr button, .aicr input, .aicr select').forEach(node => { node.disabled = false; });
+            document.querySelectorAll('.aicr button, .aicr input, .aicr select, .aicr textarea').forEach(node => { node.disabled = false; });
         }
     }
     function button(label, action, primary = false) {
@@ -59,27 +64,6 @@
         preview.querySelector('.aicr-confirm')?.remove();
         preview.append(panel);
         panel.scrollIntoView({ block: 'nearest' });
-    }
-    function comparison(segments) {
-        const grid = el('div', undefined, 'aicr-comparison');
-        for (const side of ['before', 'after']) {
-            const column = el('div');
-            const pre = el('pre');
-            column.append(el('h4', side === 'before' ? __('Before - changes in red', 'ai-content-rinse') : __('After - replacements in green', 'ai-content-rinse')));
-            for (const segment of segments) {
-                if (!segment.label) { pre.append(document.createTextNode(segment[side])); continue; }
-                if (side === 'after' && !segment.after) continue;
-                const visible = side === 'before'
-                    ? (/[—–]/u.test(segment.before) ? segment.before : '⟦' + segment.label + '⟧')
-                    : segment.after;
-                const mark = el('mark', visible, side === 'before' ? 'aicr-removed' : 'aicr-added');
-                mark.title = segment.label + ' - ' + (side === 'before' ? __('Removed during cleanup', 'ai-content-rinse') : __('Inserted during cleanup', 'ai-content-rinse'));
-                pre.append(mark);
-            }
-            column.append(pre);
-            grid.append(column);
-        }
-        return grid;
     }
     function textDetails(result, target) {
         const labels = { post_title: __('Title', 'ai-content-rinse'), post_content: __('Content', 'ai-content-rinse'), post_excerpt: __('Excerpt', 'ai-content-rinse') };
@@ -107,7 +91,7 @@
         target.append(el('p', __('File names, media IDs and URLs are unchanged. Cached images may need a cache refresh.', 'ai-content-rinse')));
     }
     const hasFindings = result => mode === 'media' ? result.removed > 0 : result.changed;
-    const scanItem = item => api(mode === 'media' ? 'media-clean' : 'preview', { id: item.id });
+    const scanItem = item => api(mode === 'media' ? 'media-clean' : 'preview', { id: item.id, rules });
     async function inspect(item) {
         const result = await scanItem(item);
         preview.replaceChildren(el('h2', item.title || __('Untitled', 'ai-content-rinse')));
@@ -181,7 +165,7 @@
         reveal();
     }
     function pasteWorkspace() {
-        controls.replaceChildren(); pager.replaceChildren();
+        controls.replaceChildren(ruleControls()); pager.replaceChildren();
         list.replaceChildren(el('h2', __('Paste text', 'ai-content-rinse')));
         const label = el('label', __('Text to clean', 'ai-content-rinse')); label.htmlFor = 'aicr-paste';
         const input = el('textarea'); input.id = 'aicr-paste'; input.rows = 10;
@@ -190,8 +174,26 @@
         for (const [value, title] of [['plain', __('Plain text', 'ai-content-rinse')], ['html', __('WordPress / HTML - preserve markup and code', 'ai-content-rinse')]]) {
             const option = el('option', title); option.value = value; format.append(option);
         }
+        const invalidate = () => { preview.replaceChildren(); preview.hidden = true; };
+        input.addEventListener('input', invalidate); format.addEventListener('change', invalidate);
+        const exampleConfirmation = el('div');
+        const loadExample = () => {
+            const sample = __('Copied text', 'ai-content-rinse') + ' \u2014 ' + __('review', 'ai-content-rinse') + '\u200B ' + __('and clean', 'ai-content-rinse') + ' \u2013 123.\n';
+            input.value = format.value === 'html'
+                ? '<!-- wp:paragraph -->\n<p>' + sample.trim() + '</p>\n<!-- /wp:paragraph -->'
+                : sample;
+            exampleConfirmation.replaceChildren(); invalidate(); input.focus();
+        };
+        list.append(button(__('Load example', 'ai-content-rinse'), async () => {
+            if (!input.value) { loadExample(); return; }
+            const panel = el('div', undefined, 'aicr-confirm');
+            panel.append(el('p', __('Replace the text you entered with the example?', 'ai-content-rinse')),
+                button(__('Replace with example', 'ai-content-rinse'), async () => loadExample()),
+                button(__('Keep my text', 'ai-content-rinse'), async () => { exampleConfirmation.replaceChildren(); input.focus(); }));
+            exampleConfirmation.replaceChildren(panel);
+        }), exampleConfirmation);
         list.append(label, input, formatLabel, format, button(__('Preview cleanup', 'ai-content-rinse'), async () => {
-            const result = await api('paste', { text: input.value, format: format.value });
+            const result = await api('paste', { text: input.value, format: format.value, rules });
             preview.replaceChildren(el('h2', __('Pasted text preview', 'ai-content-rinse')), comparison(result.segments));
             preview.append(el('p', __('Characters changed:', 'ai-content-rinse') + ' ' + Object.values(result.counts).reduce((a, b) => a + b, 0)));
             const outputLabel = el('label', __('Cleaned text', 'ai-content-rinse')); outputLabel.htmlFor = 'aicr-output';
@@ -205,6 +207,7 @@
     }
     function renderControls() {
         controls.replaceChildren();
+        if (mode === 'text') controls.append(ruleControls());
         const searchLabel = el('label', __('Search titles and content', 'ai-content-rinse')); searchLabel.htmlFor = 'aicr-search';
         const input = el('input'); input.id = 'aicr-search'; input.type = 'search'; input.value = search;
         const doSearch = async () => { search = input.value; page = 1; await load(); };
@@ -249,7 +252,7 @@
             row.append(info);
             if (mode === 'history') row.append(button(__('Restore original text', 'ai-content-rinse'), async () => {
                 if (!window.confirm(__('Restore the text saved before cleaning? Later edits will block restoration.', 'ai-content-rinse'))) return;
-                await api('restore', { id: item.id }); await load();
+                await api('restore', { id: item.id, rules }); await load();
             }));
             else row.append(button(__('Scan & preview', 'ai-content-rinse'), () => inspect(item)));
             list.append(row);

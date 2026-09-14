@@ -2,7 +2,7 @@
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit; }
 $version = require __DIR__ . '/check-release.php';
 $root = dirname(__DIR__);
-$files = ['ai-content-rinse.php','includes.php','media.php','readme.txt','LICENSE.txt','THIRD-PARTY-NOTICES.txt','assets/admin.js','assets/admin.css'];
+$files = ['ai-content-rinse.php','includes.php','media.php','readme.txt','LICENSE.txt','THIRD-PARTY-NOTICES.txt','assets/admin.js','assets/common.js','assets/editor.js','assets/admin.css'];
 $build = $root . '/.build';
 if (!is_dir($build) && !mkdir($build,0755,true)) throw new RuntimeException('Cannot create build directory.');
 $zipPath = $build . '/ai-content-rinse-' . $version . '.zip';

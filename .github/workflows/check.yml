@@ -17,6 +17,9 @@ jobs:
         run: |
           find . -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l
           node --check assets/admin.js
+          node --check assets/common.js
+          node --check assets/editor.js
+          node --test tests/editor.test.cjs
       - name: Build release ZIP
         run: php tools/package.php
       - uses: WordPress/plugin-check-action@10857da14b6c2246d15402b3e69f777edcf8c12e

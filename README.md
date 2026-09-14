@@ -7,9 +7,12 @@ Review copied text character by character, clean supported image metadata in pla
 ## Features
 
 - Inspect post/page titles, content and excerpts with exact red/green change previews.
+- Clean unsaved title, content and excerpt text in the visual block editor, with preview and WordPress Undo.
+- Choose invisible-character removal and dash replacement independently; preferences are stored per administrator.
 - Remove configured invisible Unicode characters and normalize em/en dashes to ASCII hyphens.
 - Preserve HTML/Gutenberg markup, attributes, code and emoji joiners in structured content.
 - Paste plain text or HTML, preview cleanup and copy the result without creating a post.
+- Load a demonstration text to try the cleanup; confirm before replacing entered text.
 - Search records, filter findings on the current page and review selected items before batch changes.
 - Clean PNG text and caBX C2PA, JPEG comments/XMP and WebP XMP in existing image files.
 - Include existing image sizes, saved originals and edit backups, preserving other bytes.
@@ -20,7 +23,7 @@ Review copied text character by character, clean supported image metadata in pla
 
 Requires WordPress 6.5+ and PHP 8.1+. Tested locally with WordPress 7.1 and PHP 8.3.
 
-Build the installable archive with `php tools/package.php`, then upload `.build/ai-content-rinse-0.3.3.zip` through Plugins > Add New > Upload Plugin. Open Tools > AI Content Rinse after activation.
+Build the installable archive with `php tools/package.php`, then upload `.build/ai-content-rinse-0.4.0.zip` through Plugins > Add New > Upload Plugin. Open Tools > AI Content Rinse after activation. For the block editor, open Settings > Post or Page > AI Content Rinse.
 
 A GitHub source download is a development archive. The ZIP produced by the packaging script is the WordPress installation package.
 
@@ -32,9 +35,11 @@ Image cleanup replaces existing files and has no recovery copy. Names, attachmen
 
 Text recovery records are retained on uninstall. Page-builder data is not supported. No automatic cleaning on upload or post save is performed.
 
+Editor cleanup updates the current editor fields; save or publish with WordPress. Normal WordPress autosave remains active. Use WordPress Undo to revert this action. The editor does not create a plugin History recovery record. The panel requires administrator access and the visual block editor for posts/pages. It rejects stale previews, bound or invalid blocks, and content that cannot be parsed and serialized exactly. The title, content and excerpt together must fit within 1 MB.
+
 ## Development
 
-Planned additions are tracked in [ROADMAP.md](ROADMAP.md), one feature per future release.
+The agreed 0.4.0 scope and progress are tracked in [ROADMAP.md](ROADMAP.md).
 
 The runtime files are at the repository root. No JavaScript compilation or vendor dependencies are required. GitHub Actions builds an allowlisted ZIP, checks PHP/JavaScript syntax and runs WordPress Plugin Check.
 
@@ -43,6 +48,8 @@ Integration tests require a disposable WordPress installation with this plugin a
 ```sh
 php tests/test-plugin.php
 php tests/test-v030.php
+php tests/test-v040.php
+node --test tests/editor.test.cjs
 ```
 
 The tests create and remove their own fixtures. They check text recovery, exact diffs, metadata removal, in-place replacement, stale previews, malformed data and unchanged non-target image bytes.

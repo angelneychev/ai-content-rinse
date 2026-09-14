@@ -11,17 +11,59 @@ function aicr_permission() {
 
 /** Register authenticated routes. */
 function aicr_routes() {
-	foreach ( array( 'items' => 'GET', 'preview' => 'POST', 'paste' => 'POST', 'apply' => 'POST', 'restore' => 'POST', 'media-clean' => 'POST', 'media-copy' => 'POST' ) as $route => $method ) {
+	foreach ( array( 'items' => 'GET', 'preview' => 'POST', 'paste' => 'POST', 'editor-preview' => 'POST', 'settings' => 'GET,POST', 'apply' => 'POST', 'restore' => 'POST', 'media-clean' => 'POST', 'media-copy' => 'POST' ) as $route => $method ) {
 		register_rest_route( 'ai-content-rinse/v1', '/' . $route, array( 'methods' => $method, 'callback' => 'aicr_' . str_replace( '-', '_', $route ), 'permission_callback' => 'aicr_permission' ) );
 	}
+}
+
+/** Read the current user's cleanup preferences. */
+function aicr_preferences() {
+	$saved = get_user_meta( get_current_user_id(), '_aicr_rules', true );
+	$defaults = array( 'invisible' => true, 'dashes' => true );
+	return is_array( $saved ) ? array_intersect_key( $saved, $defaults ) + $defaults : $defaults;
+}
+
+/** Validate explicit rules, or use the current user's preferences.
+ * @param WP_REST_Request $request Request.
+ * @return array|WP_Error Rules.
+ */
+function aicr_request_rules( $request ) {
+	$rules = $request->get_param( 'rules' );
+	if ( null === $rules ) {
+		return aicr_preferences();
+	}
+	if ( ! is_array( $rules ) || count( $rules ) !== 2 || ! isset( $rules['invisible'], $rules['dashes'] ) || ! is_bool( $rules['invisible'] ) || ! is_bool( $rules['dashes'] ) ) {
+		return new WP_Error( 'aicr_rules', __( 'Choose true or false for both cleanup settings.', 'ai-content-rinse' ), array( 'status' => 400 ) );
+	}
+	return $rules;
+}
+
+/** Get or save per-user cleanup settings.
+ * @param WP_REST_Request $request Request.
+ * @return array|WP_Error Rules.
+ */
+function aicr_settings( $request ) {
+	$rules = aicr_request_rules( $request );
+	if ( is_wp_error( $rules ) ) {
+		return $rules;
+	}
+	if ( 'POST' === $request->get_method() ) {
+		update_user_meta( get_current_user_id(), '_aicr_rules', $rules );
+		if ( aicr_preferences() !== $rules ) {
+			return new WP_Error( 'aicr_settings', __( 'Could not save cleanup settings. Try again.', 'ai-content-rinse' ), array( 'status' => 500 ) );
+		}
+	}
+	return $rules;
 }
 
 /** Clean text nodes only, preserving tags, comments, code, emoji joiners and Cyrillic.
  * @param string $text Source.
  * @param bool   $plain Whether markup should be treated as plain text.
+ * @param array  $rules Enabled cleanup categories.
  * @return array Result and counts.
  */
-function aicr_clean_text( $text, $plain = false ) {
+function aicr_clean_text( $text, $plain = false, $rules = array() ) {
+	$rules += array( 'invisible' => true, 'dashes' => true );
 	$counts = array();
 	$segments = array();
 	// Do not touch block comments, attributes, shortcodes or code-like elements.
@@ -78,7 +120,14 @@ function aicr_clean_text( $text, $plain = false ) {
 		"\u{FFFB}" => 'U+FFF9-U+FFFB',
 		"\u{FFA0}" => 'U+FFA0',
 	);
-	$pattern = '/[' . implode( '', array_keys( $map ) ) . '\x{E0000}-\x{E0FFF}\x{FFF0}-\x{FFF8}]/u';
+	foreach ( array_keys( $map ) as $char ) {
+		$is_dash = in_array( $char, array( '—', '–' ), true );
+		if ( ! $rules[ $is_dash ? 'dashes' : 'invisible' ] ) {
+			unset( $map[ $char ] );
+		}
+	}
+	$characters = implode( '', array_keys( $map ) ) . ( $rules['invisible'] ? '\x{E0000}-\x{E0FFF}\x{FFF0}-\x{FFF8}' : '' );
+	$pattern = '' === $characters ? '/(?!)/u' : '/[' . $characters . ']/u';
 	foreach ( $pieces as $index => $piece ) {
 		if ( 1 === $index % 2 ) {
 			$segments[] = array( 'before' => $piece, 'after' => $piece, 'label' => '' );
@@ -118,11 +167,50 @@ function aicr_clean_text( $text, $plain = false ) {
  * @return array|WP_Error Result.
  */
 function aicr_paste( $request ) {
+	$rules = aicr_request_rules( $request );
+	if ( is_wp_error( $rules ) ) {
+		return $rules;
+	}
 	$text = $request->get_param( 'text' );
 	if ( ! is_string( $text ) || strlen( $text ) > MB_IN_BYTES || ! preg_match( '//u', $text ) ) {
 		return new WP_Error( 'aicr_text', __( 'Enter valid text up to 1 MB.', 'ai-content-rinse' ), array( 'status' => 400 ) );
 	}
-	return aicr_clean_text( $text, 'plain' === $request->get_param( 'format' ) );
+	return aicr_clean_text( $text, 'plain' === $request->get_param( 'format' ), $rules );
+}
+
+/** Preview the editor's unsaved fields without writing to the database.
+ * @param WP_REST_Request $request Request.
+ * @return array|WP_Error Preview.
+ */
+function aicr_editor_preview( $request ) {
+	$post = aicr_post( $request->get_param( 'id' ) );
+	if ( is_wp_error( $post ) ) {
+		return $post;
+	}
+	$rules = aicr_request_rules( $request );
+	if ( is_wp_error( $rules ) ) {
+		return $rules;
+	}
+	$fields = $request->get_param( 'fields' );
+	$size = 0;
+	foreach ( array( 'post_title', 'post_content', 'post_excerpt' ) as $key ) {
+		if ( ! is_array( $fields ) || ! isset( $fields[ $key ] ) || ! is_string( $fields[ $key ] ) || ! preg_match( '//u', $fields[ $key ] ) ) {
+			return new WP_Error( 'aicr_text', __( 'The editor must supply valid title, content and excerpt text.', 'ai-content-rinse' ), array( 'status' => 400 ) );
+		}
+		$size += strlen( $fields[ $key ] );
+	}
+	if ( $size > MB_IN_BYTES || count( $fields ) !== 3 ) {
+		return new WP_Error( 'aicr_text', __( 'Editor cleanup supports up to 1 MB of text.', 'ai-content-rinse' ), array( 'status' => 400 ) );
+	}
+	$result = array( 'before' => $fields, 'after' => array(), 'counts' => array(), 'segments' => array() );
+	foreach ( $fields as $key => $value ) {
+		$clean = aicr_clean_text( $value, false, $rules );
+		$result['after'][ $key ] = $clean['text'];
+		$result['counts'][ $key ] = $clean['counts'];
+		$result['segments'][ $key ] = $clean['segments'];
+	}
+	$result['changed'] = $result['before'] !== $result['after'];
+	return $result;
 }
 
 /** Read supported editable content.
@@ -180,6 +268,10 @@ function aicr_items( $request ) {
  * @return array|WP_Error Preview.
  */
 function aicr_preview( $request ) {
+	$rules = aicr_request_rules( $request );
+	if ( is_wp_error( $rules ) ) {
+		return $rules;
+	}
 	$post = aicr_post( $request->get_param( 'id' ) );
 	if ( is_wp_error( $post ) ) {
 		return $post;
@@ -189,7 +281,7 @@ function aicr_preview( $request ) {
 	$counts = array();
 	$segments = array();
 	foreach ( $before as $key => $value ) {
-		$result = aicr_clean_text( $value );
+		$result = aicr_clean_text( $value, false, $rules );
 		$after[ $key ] = $result['text'];
 		$counts[ $key ] = $result['counts'];
 		$segments[ $key ] = $result['segments'];

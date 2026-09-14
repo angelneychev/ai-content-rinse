@@ -1,11 +1,11 @@
 # Next steps
 
-Agreed on September 11, 2026. These are planned additions, not implemented features.
+Initially recorded on September 11, 2026. On September 13, Angel agreed to combine these additions into 0.4.0. On September 14, Angel requested implementation.
 
-Deliver one addition at a time in separate future releases. Start each item only when Angel requests it. Decide version numbers and dates when preparing the corresponding release.
+Version 0.4.0 is implemented and installed locally, with an installable ZIP. Public deployment is tracked separately from implementation.
 
-1. Editor cleanup button. Review and clean the current post directly from the WordPress editor, with a preview before applying changes. Define how unsaved editor changes are handled before implementation.
-2. Separate cleanup settings. Let users choose invisible-character cleanup and dash replacement independently, with the selected rules reflected in the preview.
-3. Load example button. Insert a demonstration text so users can immediately see which characters are found and how the cleanup changes them. Avoid overwriting text already entered without confirmation.
+1. Implemented: block editor panel. Preview unsaved title, content and excerpt; apply to the editor with WordPress Undo and normal Save. Reject stale previews and block structures that cannot be preserved exactly.
+2. Implemented: separate invisible-character and dash settings, stored per administrator and used by workspace, paste and editor previews.
+3. Implemented: Load example button for plain text and HTML, with confirmation before replacing entered text.
 
-Keep each release focused on its selected addition, verify the affected behavior, and update its documentation before publishing. This roadmap does not authorize implementing or publishing these features now.
+Integration and browser checks passed, directory screenshots were updated, and the ZIP was built. See VALIDATION-0.4.0.md for evidence and limitations. The remaining release step is public deployment to WordPress.org. Add further features only after agreeing on the next scope with Angel.
