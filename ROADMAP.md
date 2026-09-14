@@ -9,3 +9,13 @@ Version 0.4.0 is implemented, installed locally and published to WordPress.org o
 3. Implemented: Load example button for plain text and HTML, with confirmation before replacing entered text.
 
 Integration and browser checks passed, directory screenshots were updated, and the ZIP was built. See VALIDATION-0.4.0.md for evidence and limitations. All three agreed additions are included in the published release. Add further features only after agreeing on the next scope with Angel.
+
+## Future additions
+
+Recorded at Angel's request on September 14, 2026. These items are planned only; implementation has not been requested. Choose the release scope, version number and timing after collecting feedback from actual use.
+
+1. Selected-content cleanup. Preview and clean only a selected block or highlighted text in the editor. Suggested first priority. Preserve surrounding content, markup and the editor's undo behavior.
+2. Bulgarian interface translation. Translate the plugin's controls, messages and help text using the existing WordPress translation support.
+3. Media Library shortcut. Add a metadata inspection button directly in the Media Library, leading to the existing review and cleanup workflow.
+
+Start development only when Angel asks to proceed.
