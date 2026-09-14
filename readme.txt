@@ -57,10 +57,12 @@ No. It reports concrete character and metadata findings only.
 
 == Screenshots ==
 
-1. Paste text, inspect changes highlighted in red and green, and copy the cleaned result.
-2. Clean visible text while preserving WordPress block comments, HTML markup and code.
-3. Review supported image metadata before replacing the existing file. This example uses demonstration metadata.
-4. Preview unsaved title, content and excerpt changes directly in the block editor before applying them.
+1. Open AI Content Rinse beside your article in the block editor and choose the cleanup settings.
+2. Compare proposed changes to the article title and content, highlighted in red and green.
+3. See the cleaned article in the editor with its layout preserved and a confirmation that changes were applied.
+4. Load an example or paste text, choose the cleanup settings, preview exact changes and copy the result.
+5. Clean visible text while preserving WordPress block comments, HTML markup and code.
+6. Review supported image metadata before replacing the existing file. This example uses demonstration metadata.
 
 == Changelog ==
 
