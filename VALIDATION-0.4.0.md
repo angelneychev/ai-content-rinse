@@ -26,4 +26,4 @@ September 14, 2026. Local WordPress 7.1, PHP 8.3, Chrome.
 
 The editor panel supports administrators using the visual block editor for posts/pages. It does not add a Classic Editor toolbar button. Invalid/bound blocks and content that cannot be parsed and serialized exactly are rejected. WordPress autosave remains active; applying cleanup does not itself publish, and does not add a plugin History recovery record. Editor input is limited to 1 MB across the three fields.
 
-The package is ready for review locally. Version 0.4.0 has not been deployed to WordPress.org as part of this implementation task.
+Following Angel's publication request, version 0.4.0 and the four screenshots were published to WordPress.org on September 14, 2026, in SVN revision 3694644. GitHub Plugin checks passed for implementation commit b99194b9ca73e037bc1c0fe2952f08e634be91d8. SVN trunk and tags/0.4.0 were compared against all 10 runtime source files before deployment and matched exactly.
